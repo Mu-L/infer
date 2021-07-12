@@ -417,7 +417,7 @@ let analyze_procedure ({InterproceduralAnalysis.proc_desc; tenv} as interproc) =
     let proc_data = {interproc; formals} in
     let loc = Procdesc.get_loc proc_desc in
     let set_lock_state_for_synchronized_proc astate =
-      if Procdesc.is_java_synchronized proc_desc then
+      if Procdesc.is_java_synchronized proc_desc || Procdesc.is_csharp_synchronized proc_desc then
         Domain.Lock.make_java_synchronized formals procname
         |> Option.to_list
         |> Domain.acquire ~tenv astate ~procname ~loc
@@ -638,7 +638,7 @@ let fold_reportable_summaries analyze_ondemand tenv clazz ~init ~f =
   List.fold methods ~init ~f
 
 
-let is_private attrs = PredSymb.equal_access (ProcAttributes.get_access attrs) Private
+let is_private attrs = ProcAttributes.equal_access (ProcAttributes.get_access attrs) Private
 
 (*  Note about how many times we report a deadlock: normally twice, at each trace starting point.
     Due to the fact we look for deadlocks in the summaries of the class at the root of a path,
